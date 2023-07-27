@@ -14,7 +14,8 @@ import java.lang.RuntimeException
 //Наследуемся от ViewModel, так как нам не нужен внутри контекст. Если бы был нужен, то AndroidViewModel
 class MainViewModel: ViewModel() {
 
-    private val repository = ShopListRepositoryImpl
+    private val repository = ShopListRepositoryImpl //вынужденная мера, так быть не должно, потому что presentation не должен знать про data
+
     private val getShopListUseCase = GetShopListUseCase(repository)
     private val editShopItemUseCase = EditShopItemUseCase(repository)
     private val deleteShopItemUseCase = DeleteShopItemUseCase(repository)
