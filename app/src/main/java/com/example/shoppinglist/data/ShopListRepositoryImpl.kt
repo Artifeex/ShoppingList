@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.shoppinglist.domain.ShopItem
 import com.example.shoppinglist.domain.ShopListRepository
 import java.lang.RuntimeException
+import kotlin.random.Random
 
 object ShopListRepositoryImpl: ShopListRepository {
 
@@ -19,6 +20,12 @@ object ShopListRepositoryImpl: ShopListRepository {
         }
         shopList.add(newItem)
         updateList()
+    }
+
+    init {
+        for(i in 1..10) {
+            addShopItem(ShopItem("name $i", i, Random.nextBoolean()))
+        }
     }
 
     override fun deleteShopItem(shopItem: ShopItem) {
