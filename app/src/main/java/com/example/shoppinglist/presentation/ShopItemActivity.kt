@@ -16,14 +16,6 @@ import java.lang.RuntimeException
 
 class ShopItemActivity : AppCompatActivity() {
 
-    private lateinit var tilName: TextInputLayout
-    private lateinit var tilCount: TextInputLayout
-    private lateinit var etName: EditText
-    private lateinit var etCount: EditText
-    private lateinit var buttonSave: Button
-
-    private lateinit var viewModel: ShopItemViewModel
-
     private var screenMode = MODE_UNKNOWN
     private var shopItemId = ShopItem.UNDEFINED_ID
 
@@ -31,95 +23,20 @@ class ShopItemActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_shop_item)
         parseIntent()
-        viewModel = ViewModelProvider(this)[ShopItemViewModel::class.java]
-        initViews()
-        addTextChangeListeners()
-        launchRightMode()
-        observeViewModel()
-
-
+        if(savedInstanceState == null) {
+            launchRightMode()
+        }
     }
 
     private fun launchRightMode() {
-        when (screenMode) {
-            MODE_EDIT -> launchEditMode()
-            MODE_ADD -> launchAddMode()
+        val fragment = when (screenMode) {
+            MODE_EDIT -> ShopItemFragment.newInstanceEditItem(shopItemId)
+            MODE_ADD -> ShopItemFragment.newInstanceAddItem()
+            else -> throw RuntimeException("Error")
         }
-    }
-
-    private fun addTextChangeListeners() {
-        etName.addTextChangedListener(object : TextWatcher {
-
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-
-            }
-
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                viewModel.resetErrorInputName()
-            }
-
-            override fun afterTextChanged(p0: Editable?) {
-
-            }
-        })
-        etCount.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-
-            }
-
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                viewModel.resetErrorInputCount()
-            }
-
-            override fun afterTextChanged(p0: Editable?) {
-
-            }
-        })
-    }
-
-    private fun launchEditMode() {
-        viewModel.getShopItem(shopItemId)
-        buttonSave.setOnClickListener {
-            viewModel.editShopItem(etName.text.toString(), etCount.text.toString())
-        }
-    }
-
-    private fun launchAddMode() {
-        buttonSave.setOnClickListener {
-            viewModel.addShopItem(etName.text.toString(), etCount.text.toString())
-        }
-    }
-
-    private fun initViews() {
-        tilName = findViewById(R.id.til_name)
-        tilCount = findViewById(R.id.til_count)
-        etName = findViewById(R.id.et_name)
-        etCount = findViewById(R.id.et_count)
-        buttonSave = findViewById(R.id.save_button)
-    }
-
-    private fun observeViewModel() {
-        viewModel.shopItem.observe(this) {
-            etName.setText(it.name)
-            etCount.setText(it.count.toString())
-        }
-        viewModel.errorInputCount.observe(this) { isError ->
-            if (isError) {
-                tilCount.error = "Invalid count!"
-            } else {
-                tilCount.error = null
-            }
-        }
-        viewModel.errorInputName.observe(this) { isError ->
-            if (isError) {
-                tilName.error = "Invalid name!"
-            } else {
-                tilName.error = null
-            }
-        }
-        viewModel.shouldCloseScreen.observe(this) {
-            finish()
-        }
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.shop_item_container, fragment)
+            .commit()
     }
 
     private fun parseIntent() {
