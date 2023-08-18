@@ -4,7 +4,7 @@ class AddShopItemUseCase(
     private val shopListRepository: ShopListRepository
 ) {
 
-    fun addShopItem(newItem: ShopItem) {
+    suspend fun addShopItem(newItem: ShopItem) {
         shopListRepository.addShopItem(newItem)
     }
 }
